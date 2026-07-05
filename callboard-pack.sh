@@ -7,8 +7,8 @@ set -e
 cd "$(dirname "$0")"
 PATH="$HOME/.cache/corepack-shims:$PATH"
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-pnpm exec turbo build --filter wrangler
+pnpm exec turbo build --filter wrangler --filter miniflare
 mkdir -p dist-callboard
-cd packages/wrangler
-pnpm pack --out ../../dist-callboard/wrangler-callboard.tgz
-echo "packed: $(cd ../..; pwd)/dist-callboard/wrangler-callboard.tgz"
+(cd packages/miniflare && pnpm pack --out ../../dist-callboard/miniflare-callboard.tgz)
+(cd packages/wrangler && pnpm pack --out ../../dist-callboard/wrangler-callboard.tgz)
+echo "packed: $(pwd)/dist-callboard/{wrangler,miniflare}-callboard.tgz"
