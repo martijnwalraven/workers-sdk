@@ -18,6 +18,7 @@ import { readConfig, readNewConfig } from "../../config";
 import { containersScope } from "../../containers";
 import { getNormalizedContainerOptions } from "../../containers/config";
 import { getEntry } from "../../deployment-bundle/entry";
+import { validateNodeCompatMode } from "../../deployment-bundle/node-compat";
 import { getBindings, getHostAndRoutes, getInferredHost } from "../../dev";
 import { getDurableObjectClassNameToUseSQLiteMap } from "../../dev/class-names-sqlite";
 import { getLocalPersistencePath } from "../../dev/get-local-persistence-path";
@@ -366,7 +367,18 @@ async function resolveConfig(
 		"dev"
 	);
 
-	const nodejsCompatMode = unwrapHook(input.build?.nodejsCompatMode, config);
+	// Mirror the CLI: when the caller does not provide a mode (or a hook),
+	// derive it from the resolved configuration — otherwise a programmatic
+	// dev worker silently ignores its own `nodejs_compat` compatibility
+	// flags. An explicit null still disables.
+	const nodejsCompatMode =
+		input.build?.nodejsCompatMode === undefined
+			? validateNodeCompatMode(
+					config.compatibility_date,
+					config.compatibility_flags ?? [],
+					{ noBundle: config.no_bundle }
+				)
+			: unwrapHook(input.build.nodejsCompatMode, config);
 
 	const { bindings, unsafe, printCurrentBindings } = await resolveBindings(
 		config,
