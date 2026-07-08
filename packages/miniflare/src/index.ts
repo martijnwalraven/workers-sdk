@@ -1569,7 +1569,8 @@ export class Miniflare {
 				response = await handlePrettyErrorRequest(
 					this.#log,
 					this.#workerSrcOpts,
-					request
+					request,
+					this.#sharedOpts.core.handleUncaughtError
 				);
 			} else if (url.pathname === "/core/log") {
 				const level = parseInt(
